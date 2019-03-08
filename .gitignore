@@ -1,0 +1,9 @@
+*.pptx
+*.docx
+*.Robj
+backup/*
+presentations/*
+data/*
+manuscript/*
+figures/*
+
