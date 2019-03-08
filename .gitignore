@@ -1,11 +1,14 @@
 *.pptx
 *.docx
 *.Robj
+
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
 .Rapp.history
+.DS_Store
+
 backup/*
 presentations/*
 data/*
