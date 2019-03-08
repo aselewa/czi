@@ -1,4 +1,6 @@
 
+# DEPENDENCIES
+
 suppressMessages(library(dplyr))
 suppressMessages(library(Seurat))
 suppressMessages(library(ggplot2))
@@ -88,7 +90,9 @@ getCellTag <- function(cell.ids,type){
 computeLogCPM <- function(DGEmatrix){
   
   log.cpm <- log(t((t(DGEmatrix)/colSums(DGEmatrix))*10^4)+1)
+  
   return(log.cpm)
+  
 }
 
 
