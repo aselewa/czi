@@ -2,23 +2,23 @@
 # Script that calls all other scripts 
 # Scripts must be called in this order
 
-source('required_funs_libs.R')
+source('R/required_funs_libs.R')
 
 ## Dropseq
 # Merge data into single DGE and get qc plots
-source('drop_merge_qc.R')
+source('R/drop_merge_qc.R')
 
 # Get cell-types and single cell trajectories 
-source('drop_celltypes_trajectory.R')
+source('R/drop_celltypes_trajectory.R')
 
 # Depending on your RAM, you may have to run rm(list=ls()) before starting the DroNc-seq analysis
 # none of the results for above are needed below
 
 ## DroNcseq
 # Merge data into single DGE and get qc plots
-source('dronc_merge_qc.R')
+source('R/dronc_merge_qc.R')
 
 # Run Seurat on merged Drop DGE
-source('dronc_celltypes_trajectory.R')
+source('R/dronc_celltypes_trajectory.R')
 
 
