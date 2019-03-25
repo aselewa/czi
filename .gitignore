@@ -16,4 +16,4 @@ presentations/*
 data/*
 manuscript/*
 figures/*
-
+.ipynb_checkpoints/*
