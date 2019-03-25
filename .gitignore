@@ -1,6 +1,8 @@
 *.pptx
 *.docx
 *.Robj
+*.ipynb
+*.txt
 
 .Rproj.user
 .Rhistory

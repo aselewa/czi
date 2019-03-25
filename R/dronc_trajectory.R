@@ -1,7 +1,7 @@
 # Monocle
 
-load('dronc_markers')
-load('dronc_cluster_ids.txt')
+load('dronc_markers.Robj')
+load('dronc_cluster_ids.Robj')
 
 combined <- data.frame(fread('data/DRONC_combined_m300.tsv.gz',sep='\t'),row.names=1)
 
@@ -22,7 +22,7 @@ sub_combined <- log.cpm[,sub.cells]
 sub_ids <- cluster.ids[sub.cells]
 sub_days <- day[sub.cells]
 
-top <- markers %>% group_by(cluster) %>% top_n(30, avg_logFC)
+top <- markers %>% group_by(cluster) %>% top_n(60, avg_logFC)
 var_genes <- unique(top$gene)
 
 samples.df <- data.frame(row.names = colnames(sub_combined), Day = sub_days, CellType = sub_ids)

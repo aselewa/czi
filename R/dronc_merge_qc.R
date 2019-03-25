@@ -96,7 +96,7 @@ comb <- filter(data = comb,
               min.genes = 300, 
               max.genes = 2000)
 
-fwrite(comb, file = "data/DRONC_combined_m300.tsv",quote = F, sep='\t',row.names = T, col.names = T)
+fwrite(comb, file = "data/DRONC_combined_allcells.tsv",quote = F, sep='\t',row.names = T, col.names = T)
 system('gzip data/DRONC_combined_m300.tsv')
 
 
@@ -104,13 +104,14 @@ system('gzip data/DRONC_combined_m300.tsv')
 ###############################################################################################
 
 cells <- strsplit(colnames(comb),split='_')
-uniq <- c('Day 0_Rep1','Day 0_Rep2','Day 1_Rep2','Day 3_Rep1','Day 3_Rep2','Day 7_Rep1','Day 7_Rep2','Day 15_Rep2')
+uniq <- c('Day 0_Rep1','Day 3_Rep1','Day 7_Rep1','Day 0_Rep2','Day 1_Rep2','Day 3_Rep2','Day 7_Rep2','Day 15_Rep2')
 batch_day <- factor(sapply(cells, FUN=function(x){paste0('Day ',x[2],'_',x[3])}), levels=uniq)
 
 total.genes <- c()
 total.nUMI <- c()
 total.cells <- c()
 experiment <- c()
+
 for(i in 1:length(uniq)){
   bol <- batch_day == uniq[i]
   ngenes <- colSums(comb[,bol]>0)
@@ -123,8 +124,6 @@ for(i in 1:length(uniq)){
   experiment <- c(experiment, rep(uniq[i], ncells))
 }
 
-theme_set(theme_grey())
-
 temp <- strsplit(as.character(experiment), split = '_')
 days <- factor(sapply(temp, function(x){x[1]}), levels=c('Day 0','Day 1','Day 3','Day 7','Day 15'))
 batch <- factor(sapply(temp, function(x){x[2]}), levels=c('Rep1','Rep2'))
@@ -135,18 +134,20 @@ qc2.df <- data.frame(nCells = total.cells,
                      Batch = c(rep('Rep1',3),rep('Rep2',5)))
 
 
-
 p1 <- ggplot(data = qc.df, aes(x = Day, y=nUMI, fill=Batch)) + geom_boxplot() + ylab('Number of UMI') +  
-  theme(axis.text.y = element_text(size=12), axis.text.x = element_text(size=12), text=element_text(size=15))
+  theme(axis.text.y = element_text(size=12), axis.text.x = element_text(size=12), text=element_text(size=15)) +
+  scale_fill_manual(values=c('deepskyblue3', 'gold3'))
 
 p2 <- ggplot(data = qc.df, aes(x = Day, y=nGenes, fill=Batch)) + geom_boxplot() + ylab('Number of Genes') +  
-  theme(axis.text.y = element_text(size=12), axis.text.x = element_text(size=12), text=element_text(size=15))
+  theme(axis.text.y = element_text(size=12), axis.text.x = element_text(size=12), text=element_text(size=15)) +
+  scale_fill_manual(values=c('deepskyblue3', 'gold3'))
 
 p3 <- ggplot(data = qc2.df, aes(x=Day, y=nCells, fill=Batch)) + geom_bar(stat = "identity") + ylab('Number of Cells') +
-  theme(axis.text.y = element_text(size=12), axis.text.x = element_text(size=12), text=element_text(size=15))
+  theme(axis.text.y = element_text(size=12), axis.text.x = element_text(size=12), text=element_text(size=15)) +
+  scale_fill_manual(values=c('deepskyblue3', 'gold3'))
 
 
-png('figures/dronc_QC.png',res=200, width = 1000, height=1500)
+png('../figures/dronc_QC.png',res=200, width = 1000, height=1500)
 multiplot(p1,p2,p3)
 dev.off()
 

@@ -2,6 +2,17 @@
 # Read in merged DGE matrix
 combined <- data.frame(fread('data/DROP_combined_m400.tsv.gz',sep='\t'),row.names=1)
 
+# top expressed genes
+tot <- colSums(combined)
+comb.top <- combined[order(rowSums(combined),decreasing = T)[1:15],]
+comb.percent <- t(t(comb.top)/tot)*100
+comb.melt <- melt(comb.percent)
+comb.melt <- comb.melt[comb.melt$value < 10,]
+
+comb.melt$Var1 <- factor(comb.melt$Var1, levels = rev(row.names(comb.top)))
+ggplot(comb.melt, aes(x=Var1, y=value,fill=Var1)) + geom_boxplot() + ylab('% of Total Counts') + xlab('Genes') + 
+  theme(legend.position = 'none',text = element_text(size = 18)) + coord_flip()
+
 # Extract cell identity
 cells <- strsplit(colnames(combined),split='_')
 day <- factor(sapply(cells, FUN=function(x){x[2]}),levels = c('0','1','3','7','15'))

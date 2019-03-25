@@ -92,7 +92,7 @@ computeLogCPM <- function(DGEmatrix){
   log.cpm <- log(t((t(DGEmatrix)/colSums(DGEmatrix))*10^4)+1)
   
   return(log.cpm)
-  
+  120808
 }
 
 

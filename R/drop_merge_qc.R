@@ -90,23 +90,22 @@ comb[row.names(day15_Rep2),colnames(day15_Rep2)] = day15_Rep2
 rm(day0_Rep1,day0_Rep2, day1_Rep1,day1_Rep2,day3_Rep1,day3_Rep2,day7_Rep1,day7_Rep2,day15_Rep2)
 gc()
 
-save(comb, file='DROP_combined_all')
-
 comb <- comb[rowSums(comb>0)>10,]
 
 genenames <- read.delim(file='metadata/gencode.v27.annotation.ID_to_Symbol.txt', header=F, sep="\t", row.names=1)
 comb <- matchIDToSymbol(comb, genenames)
 
-# Remove low quality cells
-comb <- filter(data = comb, 
-                  min.genes = 400, 
-                  max.genes = 2000)
 # Remove chimp cells
 species_assign <- data.frame(fread('metadata/species_assign_matrix.txt',sep='\t'))
 chimp.cells <- species_assign$CB[species_assign$hg_specificity_score<0.5]
 cells <- strsplit(colnames(comb),split='_')
 barcodes <- sapply(cells, function(x){x[1]})
 comb <- comb[,!(barcodes %in% chimp.cells)]
+
+# Remove low quality cells
+comb <- filter(data = comb, 
+               min.genes = 0, 
+               max.genes = 2000)
 
 png("figures/species_mixing.png", res=200, width = 1000, height = 800)
 ggplot(species_assign, aes(x=hg_specificity_score)) +
@@ -124,7 +123,7 @@ system('gzip data/DROP_combined_m400.tsv')
 ###############################################################################################
 
 cells <- strsplit(colnames(comb),split='_')
-uniq <- c('Day 0_Rep1','Day 0_Rep2','Day 1_Rep1','Day 1_Rep2','Day 3_Rep1','Day 3_Rep2','Day 7_Rep1','Day 7_Rep2','Day 15_Rep2')
+uniq <- c('Day 0_Rep1','Day 1_Rep1','Day 3_Rep1','Day 7_Rep1','Day 0_Rep2','Day 1_Rep2','Day 3_Rep2','Day 7_Rep2','Day 15_Rep2')
 batch_day <- factor(sapply(cells, FUN=function(x){paste0('Day ',x[2],'_',x[3])}), levels=uniq)
 
 total.genes <- c()
@@ -143,6 +142,7 @@ for(i in 1:length(uniq)){
   experiment <- c(experiment, rep(uniq[i], ncells))
 }
 
+
 temp <- strsplit(as.character(experiment), split = '_')
 days <- factor(sapply(temp, function(x){x[1]}), levels=c('Day 0','Day 1','Day 3','Day 7','Day 15'))
 batch <- factor(sapply(temp, function(x){x[2]}), levels=c('Rep1','Rep2'))
@@ -153,18 +153,22 @@ qc2.df <- data.frame(nCells = total.cells,
                      Batch = c(rep('Rep1',4),rep('Rep2',5)))
 
 
-p1 <- ggplot(data = qc.df, aes(x = Day, y=nUMI, fill=Batch)) + geom_boxplot() + ylab('Number of UMI') +  
-  theme(axis.text.y = element_text(size=12), axis.text.x = element_text(size=12), text=element_text(size=15))
+p1 <- ggplot(data = qc.df, aes(x = Day, y = nUMI, fill = Batch)) + geom_boxplot() + ylab('Number of UMI') +  
+  theme(axis.text.y = element_text(size=12), axis.text.x = element_text(size=12), text=element_text(size=15)) +
+  scale_fill_manual(values=c('deepskyblue3', 'gold3'))
 
-p2 <- ggplot(data = qc.df, aes(x = Day, y=nGenes, fill=Batch)) + geom_boxplot() + ylab('Number of Genes') +  
-  theme(axis.text.y = element_text(size=12), axis.text.x = element_text(size=12), text=element_text(size=15))
+p2 <- ggplot(data = qc.df, aes(x = Day, y = nGenes, fill = Batch)) + geom_boxplot() + ylab('Number of Genes') +  
+  theme(axis.text.y = element_text(size=12), axis.text.x = element_text(size=12), text=element_text(size=15)) +
+  scale_fill_manual(values=c('deepskyblue3', 'gold3'))
 
 p3 <- ggplot(data = qc2.df, aes(x=Day, y=nCells, fill=Batch)) + geom_bar(stat = "identity") + ylab('Number of Cells') +
-  theme(axis.text.y = element_text(size=12), axis.text.x = element_text(size=12), text=element_text(size=15))
+  theme(axis.text.y = element_text(size=12), axis.text.x = element_text(size=12), text=element_text(size=15)) +
+  scale_fill_manual(values=c('deepskyblue3', 'gold3'))
 
 
-png('figures/drop_QC.png',res=200, width = 1000, height=1500)
+png('../figures/drop_QC.png',res=200, width = 1000, height=1500)
 multiplot(p1,p2,p3)
 dev.off()
+
 
 

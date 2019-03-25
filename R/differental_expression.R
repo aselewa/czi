@@ -139,9 +139,9 @@ save(markers_tech, file='metadata/markers_tech')
 
 ## PLOTTING
 ### Start here if the above files are already generated
-load('markers_days')
-load('markers_batch')
-load('markers_tech')
+load('markers_days.Robj')
+load('markers_batch.Robj')
+load('markers_tech.Robj')
 
 pval.thresh <- 0.05
 logfc.thresh <- 4
@@ -151,11 +151,13 @@ DEGs_per_rep <- as.vector(table(markers_batch$id[markers_batch$p_val_adj < pval.
 DEGs_per_tech <- as.vector(table(markers_tech$id[markers_tech$p_val_adj < pval.thresh & abs(markers_tech$avg_logFC) > logfc.thresh]))
 
 DEGs.df <- data.frame(DEGs=c(DEGs_per_day,DEGs_per_rep,DEGs_per_tech), 
-                      type=c(rep('Per Day',length(DEGs_per_day)),rep('Per Rep',length(DEGs_per_rep)),rep('Drop/DroNC',length(DEGs_per_tech))))
+                      type=c(rep('Between Days',length(DEGs_per_day)),rep('Between Cell Lines',length(DEGs_per_rep)),rep('Between Methods',length(DEGs_per_tech))))
 
 ggplot(DEGs.df, aes(x=type, y=DEGs,fill=type)) + 
   geom_boxplot() + geom_jitter(shape=16, position=position_jitter(0.2)) +
-  theme(legend.position = 'none',text=element_text(size = 18)) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        legend.position = 'none',text=element_text(size = 18), axis.text = element_text(size=16)) +
   xlab('') + 
   ylab('Differentially Expressed Genes') + 
   scale_y_continuous(breaks = pretty(DEGs.df$DEGs, n = 5))
@@ -179,14 +181,16 @@ RNA.genes <- length(intersect(dronc.genes,linc))
 dronc.frac <- c(mito.genes,ribo.genes,RNA.genes)/length(dronc.genes)
 
 drdnc.compare <- data.frame(frac=c(drop.frac, dronc.frac),
-                            type=rep(c('Mitochondrial','Ribosomal','lincRNAs'),2),
+                            type=rep(c('Mitochondrial','Ribosomal','lncRNAs'),2),
                             tech=rep(c(rep('Drop',3),rep('DroNc',3))))
-theme_set(theme_grey())
+
 ggplot(drdnc.compare, aes(x=type, y=frac,fill=tech)) + 
   geom_bar(stat = 'identity',position="dodge",color="black") + 
-  theme(text=element_text(size = 18),legend.title = element_blank()) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        legend.position = 'none',text=element_text(size = 18), axis.text = element_text(size=16)) +
   xlab('') + 
-  ylab('Fraction of DEGs')
+  ylab('Fraction of DEGs') 
 
 
 gene <- markers_tech$gene[markers_tech$avg_logFC>0]
